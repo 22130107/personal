@@ -49,7 +49,7 @@
         </button>
         <div id="navbarMenu" class="collapse navbar-collapse">
           <ul class="navbar-nav ms-auto me-lg-3 mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link" href="#about">Về mình</a></li>
+            <li class="nav-item"><a class="nav-link" href="#about">Giới Thiệu</a></li>
             <li class="nav-item"><a class="nav-link" href="#work">Góc nhỏ</a></li>
             <li class="nav-item"><a class="nav-link" href="#writing">Tản mạn</a></li>
           </ul>
@@ -81,7 +81,7 @@
             
             <div class="d-flex flex-wrap gap-4 mt-4 pt-2">
               <div class="stat">
-                <h3 class="stat-number mb-0">18+</h3>
+                <h3 class="stat-number mb-0">10+</h3>
                 <p class="mb-0 text-secondary">Bài nhạc trong playlist chill</p>
               </div>
               <div class="stat">
@@ -122,7 +122,7 @@
         <div class="container py-5">
           <div class="row g-4 align-items-start">
             <div class="col-lg-6" data-aos="fade-up">
-              <p class="section-kicker">VỀ MÌNH</p>
+              <p class="section-kicker">Giới Thiệu</p>
               <h2 class="section-title">Chào bạn, cảm ơn vì đã ghé thăm.</h2>
               <p class="text-secondary">
                 Mình thích những thứ nhỏ xinh: một bài nhạc hợp tâm trạng,
@@ -191,7 +191,7 @@
           <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
             <div>
               <p class="section-kicker mb-2">GÓC NHỎ</p>
-              <h2 class="section-title mb-0">Một vài điều mình đang thích</h2>
+              <h2 class="section-title mb-0">Một vài điều mình thích</h2>
             </div>
             <a
               class="link-highlight"
@@ -248,7 +248,7 @@
                 <div
                   class="project-preview preview-a selfcare-showcase"
                   title="Bấm để xem toàn bộ media"
-                  data-media-sources='["assets/videos/personal/z7712447108741_eac94f1f7ec59cba15a66b9076ea26e1.jpg", "assets/videos/personal/7712415981034.mp4", "assets/videos/personal/z7712447126561_0839bec166b3a064b998b77cb5d2a405.jpg", "assets/videos/personal/7712447113307.mp4", "assets/videos/personal/z7712447130453_bd2db5dfa7cbc759a5d4c3f625cf64b9.jpg", "assets/videos/personal/7712447113644.mp4", "assets/videos/personal/7712447274590.mp4"]'
+                  data-media-sources='["assets/videos/personal/z7712447126561_0839bec166b3a064b998b77cb5d2a405.jpg","assets/videos/personal/7712447274590.mp4"]'
                 >
                   <img class="selfcare-media-image" alt="Khoảnh khắc chăm sóc bản thân" loading="lazy" />
                   <video
@@ -484,6 +484,15 @@
         </div>
       </div>
     </div>
+
+    <audio id="introAudio" preload="auto" aria-hidden="true">
+      <source src="assets/intro.mp3" type="audio/mp4" />
+      <source src="assets/intro.mp3" type="audio/mpeg" />
+    </audio>
+
+    <button id="introUnlockBtn" class="btn btn-gradient btn-sm intro-unlock-btn d-none" type="button">
+      <i class="bi bi-volume-up-fill me-1"></i>Bật nhạc
+    </button>
 
  
 

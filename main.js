@@ -3,6 +3,89 @@ const nav = document.querySelector(".navbar-glass");
 const heroStack = document.querySelector(".hero-stack");
 const navLinks = document.querySelectorAll("#navbarMenu .nav-link");
 const navbarMenu = document.getElementById("navbarMenu");
+const introAudio = document.getElementById("introAudio");
+const introUnlockBtn = document.getElementById("introUnlockBtn");
+
+if (introAudio) {
+  const showUnlockBtn = () => {
+    if (introUnlockBtn) {
+      introUnlockBtn.classList.remove("d-none");
+    }
+  };
+
+  const hideUnlockBtn = () => {
+    if (introUnlockBtn) {
+      introUnlockBtn.classList.add("d-none");
+    }
+  };
+
+  const playIntro = () => {
+    const playPromise = introAudio.play();
+    if (playPromise && typeof playPromise.then === "function") {
+      playPromise
+        .then(() => {
+          hideUnlockBtn();
+        })
+        .catch(() => {
+          showUnlockBtn();
+        });
+    }
+  };
+
+  const unlockByGesture = () => {
+    const retryPromise = introAudio.play();
+    if (retryPromise && typeof retryPromise.then === "function") {
+      retryPromise
+        .then(() => {
+          hideUnlockBtn();
+        })
+        .catch(() => {
+          showUnlockBtn();
+        });
+    }
+  };
+
+  introAudio.currentTime = 0;
+  introAudio.volume = 1;
+
+  if (document.readyState === "complete") {
+    playIntro();
+  } else {
+    window.addEventListener("load", playIntro, { once: true });
+  }
+
+  introAudio.addEventListener(
+    "canplaythrough",
+    () => {
+      if (introAudio.paused) {
+        playIntro();
+      }
+    },
+    { once: true }
+  );
+
+  document.addEventListener("pointerdown", unlockByGesture, { once: true });
+  document.addEventListener("keydown", unlockByGesture, { once: true });
+  document.addEventListener("touchstart", unlockByGesture, { once: true });
+
+  if (introUnlockBtn) {
+    introUnlockBtn.addEventListener("click", unlockByGesture);
+  }
+
+  introAudio.addEventListener("play", () => {
+    hideUnlockBtn();
+  });
+
+  introAudio.addEventListener("error", () => {
+    if (!introUnlockBtn) {
+      return;
+    }
+
+    introUnlockBtn.classList.remove("d-none");
+    introUnlockBtn.disabled = true;
+    introUnlockBtn.textContent = "Khong the phat nhac";
+  });
+}
 
 if (yearEl) {
   yearEl.textContent = String(new Date().getFullYear());
@@ -638,6 +721,126 @@ if (contactForm) {
     : "";
   const isLocalFileMode = window.location.protocol === "file:";
 
+  const spamGuardKey = "hyun_contact_spam_guard_v1";
+  const spamMinFillMs = 3500;
+  const spamMinIntervalMs = 25000;
+  const spamWindowMs = 10 * 60 * 1000;
+  const spamMaxPerWindow = 3;
+  const spamDuplicateWindowMs = 30 * 60 * 1000;
+
+  let formOpenedAt = Date.now();
+
+  const normalizeText = (value) => String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
+
+  const readSpamState = () => {
+    try {
+      const raw = window.localStorage.getItem(spamGuardKey);
+      const parsed = raw ? JSON.parse(raw) : {};
+
+      const submissions = Array.isArray(parsed.submissions)
+        ? parsed.submissions.filter((time) => typeof time === "number")
+        : [];
+
+      const recentPayloads = Array.isArray(parsed.recentPayloads)
+        ? parsed.recentPayloads.filter(
+            (item) =>
+              item &&
+              typeof item.fingerprint === "string" &&
+              typeof item.timestamp === "number"
+          )
+        : [];
+
+      const lastSubmitAt = typeof parsed.lastSubmitAt === "number" ? parsed.lastSubmitAt : 0;
+
+      return { submissions, recentPayloads, lastSubmitAt };
+    } catch {
+      return { submissions: [], recentPayloads: [], lastSubmitAt: 0 };
+    }
+  };
+
+  const saveSpamState = (state) => {
+    try {
+      window.localStorage.setItem(spamGuardKey, JSON.stringify(state));
+    } catch {
+      // Ignore storage failures (private mode / blocked storage).
+    }
+  };
+
+  const pruneSpamState = (state, now) => {
+    const submissions = state.submissions.filter((time) => now - time <= spamWindowMs);
+    const recentPayloads = state.recentPayloads.filter(
+      (item) => now - item.timestamp <= spamDuplicateWindowMs
+    );
+
+    return {
+      submissions,
+      recentPayloads,
+      lastSubmitAt: state.lastSubmitAt,
+    };
+  };
+
+  const createPayloadFingerprint = (formData) => {
+    const name = normalizeText(formData.get("ho_ten"));
+    const topic = normalizeText(formData.get("chu_de"));
+    const message = normalizeText(formData.get("loi_nhan"));
+    return `${name}::${topic}::${message}`;
+  };
+
+  const validateSpamGuard = (formData) => {
+    const now = Date.now();
+
+    if (now - formOpenedAt < spamMinFillMs) {
+      return {
+        ok: false,
+        message: "Bạn gửi quá nhanh. Vui lòng chờ vài giây rồi thử lại.",
+      };
+    }
+
+    const state = pruneSpamState(readSpamState(), now);
+
+    if (state.lastSubmitAt && now - state.lastSubmitAt < spamMinIntervalMs) {
+      const waitSeconds = Math.ceil((spamMinIntervalMs - (now - state.lastSubmitAt)) / 1000);
+      return {
+        ok: false,
+        message: `Bạn vừa gửi xong. Vui lòng chờ ${waitSeconds}s để gửi tiếp.`,
+      };
+    }
+
+    if (state.submissions.length >= spamMaxPerWindow) {
+      return {
+        ok: false,
+        message: "Bạn đã gửi quá nhiều lần trong thời gian ngắn. Vui lòng thử lại sau ít phút.",
+      };
+    }
+
+    const fingerprint = createPayloadFingerprint(formData);
+    const isDuplicate = state.recentPayloads.some((item) => item.fingerprint === fingerprint);
+
+    if (isDuplicate) {
+      return {
+        ok: false,
+        message: "Nội dung này vừa được gửi gần đây. Vui lòng chỉnh nội dung trước khi gửi lại.",
+      };
+    }
+
+    return {
+      ok: true,
+      state,
+      now,
+      fingerprint,
+    };
+  };
+
+  const commitSpamGuard = (state, now, fingerprint) => {
+    const nextState = {
+      submissions: [...state.submissions, now],
+      recentPayloads: [...state.recentPayloads, { fingerprint, timestamp: now }],
+      lastSubmitAt: now,
+    };
+
+    saveSpamState(nextState);
+  };
+
   const setStatus = (message, tone = "info") => {
     if (!statusEl) {
       return;
@@ -691,8 +894,19 @@ if (contactForm) {
 
     const formData = new FormData(contactForm);
 
+    if (formData.get("_honey")) {
+      setStatus("Yêu cầu không hợp lệ. Vui lòng thử lại.", "error");
+      return;
+    }
+
     if (!formData.get("chu_de")) {
       setStatus("Vui lòng chọn chủ đề trước khi gửi.", "error");
+      return;
+    }
+
+    const spamGuardResult = validateSpamGuard(formData);
+    if (!spamGuardResult.ok) {
+      setStatus(spamGuardResult.message, "error");
       return;
     }
 
@@ -729,6 +943,8 @@ if (contactForm) {
       }
 
       contactForm.reset();
+      commitSpamGuard(spamGuardResult.state, spamGuardResult.now, spamGuardResult.fingerprint);
+      formOpenedAt = Date.now();
       setStatus("Đã gửi thành công. Bạn sẽ nhận email thông báo sớm.", "success");
     } catch (error) {
       const message = error instanceof Error && error.message ? error.message : "Gửi thất bại. Bạn thử lại sau nhé.";
