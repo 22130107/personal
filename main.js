@@ -12,7 +12,8 @@ if (window.AOS) {
   window.AOS.init({
     duration: 700,
     easing: "ease-out-cubic",
-    once: true,
+    once: false,
+    mirror: true,
     offset: 70,
   });
 }
@@ -166,6 +167,465 @@ movieShowcases.forEach((showcase) => {
     }
   });
 });
+
+const selfcareShowcases = document.querySelectorAll(".selfcare-showcase");
+
+selfcareShowcases.forEach((showcase) => {
+  const imageEl = showcase.querySelector(".selfcare-media-image");
+  const videoEl = showcase.querySelector(".selfcare-media-video");
+  const statusLabel = showcase.querySelector(".selfcare-status");
+
+  if (!imageEl || !videoEl) {
+    return;
+  }
+
+  const rawSources = showcase.getAttribute("data-media-sources");
+  let sources = [];
+
+  if (rawSources) {
+    try {
+      const parsedSources = JSON.parse(rawSources);
+      if (Array.isArray(parsedSources)) {
+        sources = parsedSources
+          .map((item) => (typeof item === "string" ? item.trim() : ""))
+          .filter(Boolean);
+      }
+    } catch {
+      sources = [];
+    }
+  }
+
+  if (sources.length === 0) {
+    showcase.classList.add("has-media-error");
+    if (statusLabel) {
+      statusLabel.textContent = "Chua co media";
+    }
+    return;
+  }
+
+  const imagePattern = /\.(jpg|jpeg|png|gif|webp|avif)$/i;
+  const videoPattern = /\.(mp4|webm|ogg)$/i;
+  const imageDurationMs = 3200;
+
+  let activeIndex = 0;
+  let consecutiveErrorCount = 0;
+  let imageTimeoutId;
+
+  const clearImageTimeout = () => {
+    if (imageTimeoutId) {
+      window.clearTimeout(imageTimeoutId);
+      imageTimeoutId = undefined;
+    }
+  };
+
+  const updateStatus = () => {
+    if (!statusLabel) {
+      return;
+    }
+
+    statusLabel.textContent = `Media ${activeIndex + 1}/${sources.length}`;
+  };
+
+  const moveToNext = () => {
+    activeIndex = (activeIndex + 1) % sources.length;
+    showActive();
+  };
+
+  const showActive = () => {
+    clearImageTimeout();
+
+    const currentSource = sources[activeIndex];
+    const isImage = imagePattern.test(currentSource);
+    const isVideo = videoPattern.test(currentSource);
+
+    if (!isImage && !isVideo) {
+      consecutiveErrorCount += 1;
+      if (consecutiveErrorCount >= sources.length) {
+        showcase.classList.add("has-media-error");
+        if (statusLabel) {
+          statusLabel.textContent = "Khong the tai media";
+        }
+        return;
+      }
+
+      moveToNext();
+      return;
+    }
+
+    updateStatus();
+
+    if (isImage) {
+      videoEl.pause();
+      videoEl.removeAttribute("src");
+      videoEl.load();
+
+      imageEl.hidden = false;
+      videoEl.hidden = true;
+
+      imageEl.src = currentSource;
+      imageTimeoutId = window.setTimeout(moveToNext, imageDurationMs);
+      return;
+    }
+
+    imageEl.hidden = true;
+    videoEl.hidden = false;
+
+    videoEl.src = currentSource;
+    videoEl.load();
+
+    const playPromise = videoEl.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        // Browser autoplay policy may block play before user interaction.
+      });
+    }
+  };
+
+  imageEl.addEventListener("load", () => {
+    consecutiveErrorCount = 0;
+  });
+
+  imageEl.addEventListener("error", () => {
+    consecutiveErrorCount += 1;
+
+    if (consecutiveErrorCount >= sources.length) {
+      showcase.classList.add("has-media-error");
+      if (statusLabel) {
+        statusLabel.textContent = "Khong the tai media";
+      }
+      return;
+    }
+
+    moveToNext();
+  });
+
+  videoEl.addEventListener("loadeddata", () => {
+    consecutiveErrorCount = 0;
+  });
+
+  videoEl.addEventListener("ended", moveToNext);
+
+  videoEl.addEventListener("error", () => {
+    consecutiveErrorCount += 1;
+
+    if (consecutiveErrorCount >= sources.length) {
+      showcase.classList.add("has-media-error");
+      if (statusLabel) {
+        statusLabel.textContent = "Khong the tai media";
+      }
+      return;
+    }
+
+    moveToNext();
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden || videoEl.hidden || showcase.classList.contains("has-media-error")) {
+      return;
+    }
+
+    const playPromise = videoEl.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+  });
+
+  showActive();
+});
+
+const musicVideoShowcases = document.querySelectorAll(".music-video-showcase");
+
+musicVideoShowcases.forEach((showcase) => {
+  const player = showcase.querySelector(".music-video-player");
+  const statusLabel = showcase.querySelector(".music-video-status");
+
+  if (!player) {
+    return;
+  }
+
+  const rawSources = showcase.getAttribute("data-video-sources");
+  let sources = [];
+
+  if (rawSources) {
+    try {
+      const parsedSources = JSON.parse(rawSources);
+      if (Array.isArray(parsedSources)) {
+        sources = parsedSources
+          .map((item) => (typeof item === "string" ? item.trim() : ""))
+          .filter(Boolean);
+      }
+    } catch {
+      sources = [];
+    }
+  }
+
+  if (sources.length === 0) {
+    showcase.classList.add("has-video-error");
+    if (statusLabel) {
+      statusLabel.textContent = "Chua co video mp4";
+    }
+    return;
+  }
+
+  let activeIndex = 0;
+  let errorCount = 0;
+
+  const updateStatus = () => {
+    if (statusLabel) {
+      statusLabel.textContent = `Video ${activeIndex + 1}/${sources.length}`;
+    }
+  };
+
+  const loadActiveVideo = () => {
+    player.src = sources[activeIndex];
+    player.load();
+    updateStatus();
+
+    const playPromise = player.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        // Autoplay can be blocked depending on browser policy.
+      });
+    }
+  };
+
+  const playNextVideo = () => {
+    activeIndex = (activeIndex + 1) % sources.length;
+    errorCount = 0;
+    loadActiveVideo();
+  };
+
+  player.addEventListener("ended", playNextVideo);
+
+  player.addEventListener("error", () => {
+    errorCount += 1;
+
+    if (errorCount >= sources.length) {
+      showcase.classList.add("has-video-error");
+      if (statusLabel) {
+        statusLabel.textContent = "Khong the tai video";
+      }
+      return;
+    }
+
+    activeIndex = (activeIndex + 1) % sources.length;
+    loadActiveVideo();
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && !showcase.classList.contains("has-video-error")) {
+      const playPromise = player.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {});
+      }
+    }
+  });
+
+  loadActiveVideo();
+});
+
+const mediaGalleryModalEl = document.getElementById("mediaGalleryModal");
+const mediaGalleryTitleEl = document.getElementById("mediaGalleryTitle");
+const mediaGalleryCarouselEl = document.getElementById("mediaGalleryCarousel");
+const mediaGalleryInnerEl = document.getElementById("mediaGalleryInner");
+
+if (
+  mediaGalleryModalEl &&
+  mediaGalleryTitleEl &&
+  mediaGalleryCarouselEl &&
+  mediaGalleryInnerEl &&
+  window.bootstrap
+) {
+  const imagePattern = /\.(jpg|jpeg|png|gif|webp|avif)$/i;
+  const videoPattern = /\.(mp4|webm|ogg)$/i;
+
+  let activeGalleryTitle = "Thư viện media";
+  let activeGalleryTotal = 0;
+
+  const modal = new window.bootstrap.Modal(mediaGalleryModalEl);
+  const carousel = new window.bootstrap.Carousel(mediaGalleryCarouselEl, {
+    interval: false,
+    ride: false,
+    touch: true,
+    wrap: true,
+  });
+
+  const parseSourceList = (raw) => {
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) => (typeof item === "string" ? item.trim() : "")).filter(Boolean);
+      }
+    } catch {
+      return [];
+    }
+
+    return [];
+  };
+
+  const getShowcaseSources = (showcase) => {
+    const mixedMediaRaw = showcase.getAttribute("data-media-sources");
+    if (mixedMediaRaw) {
+      return parseSourceList(mixedMediaRaw);
+    }
+
+    const videoRaw = showcase.getAttribute("data-video-sources");
+    return parseSourceList(videoRaw);
+  };
+
+  const getShowcaseTitle = (showcase) => {
+    const cardHeading = showcase.closest("article")?.querySelector("h3");
+    if (cardHeading && cardHeading.textContent) {
+      return cardHeading.textContent.trim();
+    }
+
+    return "Thư viện media";
+  };
+
+  const getShowcaseCurrentSource = (showcase) => {
+    if (showcase.classList.contains("selfcare-showcase")) {
+      const activeImage = showcase.querySelector(".selfcare-media-image:not([hidden])");
+      const activeVideo = showcase.querySelector(".selfcare-media-video:not([hidden])");
+
+      if (activeImage && activeImage.getAttribute("src")) {
+        return activeImage.getAttribute("src");
+      }
+
+      if (activeVideo && activeVideo.getAttribute("src")) {
+        return activeVideo.getAttribute("src");
+      }
+
+      return "";
+    }
+
+    const previewVideo = showcase.querySelector(".music-video-player");
+    return previewVideo ? previewVideo.getAttribute("src") || "" : "";
+  };
+
+  const pauseGalleryVideos = () => {
+    mediaGalleryInnerEl.querySelectorAll("video").forEach((video) => {
+      video.pause();
+    });
+  };
+
+  const playActiveGalleryVideo = () => {
+    const activeVideo = mediaGalleryInnerEl.querySelector(".carousel-item.active video");
+    if (!activeVideo) {
+      return;
+    }
+
+    const playPromise = activeVideo.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+  };
+
+  const updateGalleryTitle = (index) => {
+    mediaGalleryTitleEl.textContent = `${activeGalleryTitle} (${index + 1}/${activeGalleryTotal})`;
+  };
+
+  const buildGallerySlides = (sources) => {
+    mediaGalleryInnerEl.innerHTML = "";
+
+    sources.forEach((source, index) => {
+      const item = document.createElement("div");
+      item.className = `carousel-item${index === 0 ? " active" : ""}`;
+      item.setAttribute("data-gallery-index", String(index));
+
+      const stage = document.createElement("div");
+      stage.className = "media-gallery-stage";
+
+      if (imagePattern.test(source)) {
+        const image = document.createElement("img");
+        image.src = source;
+        image.alt = `${activeGalleryTitle} - media ${index + 1}`;
+        image.loading = "lazy";
+        stage.appendChild(image);
+      } else if (videoPattern.test(source)) {
+        const video = document.createElement("video");
+        video.src = source;
+        video.controls = true;
+        video.preload = "metadata";
+        video.setAttribute("playsinline", "");
+        stage.appendChild(video);
+      }
+
+      const caption = document.createElement("p");
+      caption.className = "media-gallery-caption";
+      caption.textContent = `Media ${index + 1}/${sources.length}`;
+
+      item.append(stage, caption);
+      mediaGalleryInnerEl.appendChild(item);
+    });
+
+    mediaGalleryCarouselEl.classList.toggle("is-single", sources.length <= 1);
+  };
+
+  const openGallery = (showcase) => {
+    const sources = getShowcaseSources(showcase);
+    if (sources.length === 0) {
+      return;
+    }
+
+    activeGalleryTitle = getShowcaseTitle(showcase);
+    activeGalleryTotal = sources.length;
+
+    const currentSource = getShowcaseCurrentSource(showcase);
+    const matchedIndex = currentSource ? sources.findIndex((source) => source === currentSource) : -1;
+    const startIndex = matchedIndex >= 0 ? matchedIndex : 0;
+
+    buildGallerySlides(sources);
+    updateGalleryTitle(startIndex);
+    modal.show();
+
+    window.requestAnimationFrame(() => {
+      carousel.to(startIndex);
+      playActiveGalleryVideo();
+    });
+  };
+
+  const galleryTargets = document.querySelectorAll(".selfcare-showcase, .music-video-showcase");
+
+  galleryTargets.forEach((showcase) => {
+    showcase.setAttribute("tabindex", "0");
+    showcase.setAttribute("role", "button");
+    showcase.setAttribute("aria-label", "Bấm để xem toàn bộ media");
+
+    showcase.addEventListener("click", () => {
+      openGallery(showcase);
+    });
+
+    showcase.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") {
+        return;
+      }
+
+      event.preventDefault();
+      openGallery(showcase);
+    });
+  });
+
+  mediaGalleryCarouselEl.addEventListener("slide.bs.carousel", () => {
+    pauseGalleryVideos();
+  });
+
+  mediaGalleryCarouselEl.addEventListener("slid.bs.carousel", () => {
+    const activeItem = mediaGalleryInnerEl.querySelector(".carousel-item.active");
+    const activeIndex = activeItem ? Number(activeItem.getAttribute("data-gallery-index") || "0") : 0;
+
+    updateGalleryTitle(activeIndex);
+    playActiveGalleryVideo();
+  });
+
+  mediaGalleryModalEl.addEventListener("hidden.bs.modal", () => {
+    pauseGalleryVideos();
+    mediaGalleryInnerEl.innerHTML = "";
+  });
+}
 
 const contactForm = document.getElementById("contactForm");
 
