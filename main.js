@@ -251,6 +251,57 @@ movieShowcases.forEach((showcase) => {
   });
 });
 
+const coverMovieShowcases = document.querySelectorAll(".gongcha-showcase, .realestate-showcase");
+
+if (coverMovieShowcases.length > 0) {
+  const updateCoverShowcaseScale = () => {
+    coverMovieShowcases.forEach((showcase) => {
+      const styles = window.getComputedStyle(showcase);
+      const sourceWidth = Number.parseFloat(styles.getPropertyValue("--movie-iframe-width"));
+      const sourceHeight = Number.parseFloat(styles.getPropertyValue("--movie-iframe-height"));
+
+      if (
+        !Number.isFinite(sourceWidth) ||
+        !Number.isFinite(sourceHeight) ||
+        sourceWidth <= 0 ||
+        sourceHeight <= 0
+      ) {
+        return;
+      }
+
+      const targetWidth = showcase.clientWidth;
+      const targetHeight = showcase.clientHeight;
+
+      if (targetWidth <= 0 || targetHeight <= 0) {
+        return;
+      }
+
+      // Keep iframe always in cover mode so no empty area appears in the preview card.
+      const coverScale = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight) + 0.012;
+
+      showcase.style.setProperty("--movie-iframe-scale", coverScale.toFixed(4));
+      showcase.style.setProperty("--movie-iframe-scale-hover", (coverScale + 0.006).toFixed(4));
+    });
+  };
+
+  let resizeRafId = 0;
+
+  const handleCoverResize = () => {
+    if (resizeRafId) {
+      window.cancelAnimationFrame(resizeRafId);
+    }
+
+    resizeRafId = window.requestAnimationFrame(() => {
+      updateCoverShowcaseScale();
+      resizeRafId = 0;
+    });
+  };
+
+  updateCoverShowcaseScale();
+  window.addEventListener("load", updateCoverShowcaseScale, { once: true });
+  window.addEventListener("resize", handleCoverResize, { passive: true });
+}
+
 const selfcareShowcases = document.querySelectorAll(".selfcare-showcase");
 
 selfcareShowcases.forEach((showcase) => {
