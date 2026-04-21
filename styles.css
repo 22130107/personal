@@ -957,6 +957,14 @@ h3,
   background: var(--white);
 }
 
+.builds-scroll-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.builds-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
 @media (max-width: 991.98px) {
   .hero-section {
     min-height: auto;

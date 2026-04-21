@@ -345,16 +345,24 @@
 
       <section id="builds" class="section-shell section-blue">
         <div class="container py-5">
-          <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
-            <div>
-              <p class="section-kicker mb-2">HYUN PHÁT TRIỂN</p>
-              <h2 class="section-title mb-0">Những gì HYUN đã làm</h2>
-            </div>
-            <a class="link-highlight" href="Cố gắng mỗi ngày"></a>
+          <div class="mb-4">
+            <p class="section-kicker mb-2">HYUN PHÁT TRIỂN</p>
+            <h2 class="section-title mb-0">Những gì HYUN đã làm</h2>
           </div>
 
-          <div class="row g-4">
-            <div class="col-md-6 col-lg-3" data-aos="zoom-in-up">
+          <div class="position-relative builds-carousel-wrapper">
+            <!-- Nút mũi tên trái -->
+            <button class="btn btn-light border rounded-circle shadow-sm builds-btn-prev position-absolute top-50 start-0 translate-middle-y z-3 d-flex align-items-center justify-content-center p-0" style="width: 44px; height: 44px; margin-left: -18px; margin-top: -24px;" aria-label="Xem trước">
+              <i class="bi bi-chevron-left fs-5"></i>
+            </button>
+            
+            <!-- Nút mũi tên phải -->
+            <button class="btn btn-light border rounded-circle shadow-sm builds-btn-next position-absolute top-50 end-0 translate-middle-y z-3 d-flex align-items-center justify-content-center p-0" style="width: 44px; height: 44px; margin-right: -18px; margin-top: -24px;" aria-label="Xem thêm">
+              <i class="bi bi-chevron-right fs-5"></i>
+            </button>
+
+            <div class="row g-4 flex-nowrap overflow-auto builds-scroll-container pb-4 px-1" style="scroll-behavior: smooth;">
+              <div class="col-md-6 col-lg-3" data-aos="zoom-in-up">
               <article class="project-card h-100">
                 <div
                   class="project-preview preview-d movie-showcase"
@@ -435,45 +443,6 @@
             <div class="col-md-6 col-lg-3" data-aos="zoom-in-up" data-aos-delay="130">
               <article class="project-card h-100">
                 <div
-                  class="project-preview preview-d movie-showcase realestate-showcase"
-                  data-phrases='["Real Estate - giao diện giới thiệu dự án rõ ràng.", "Hiển thị bất động sản nổi bật theo bố cục hiện đại.", "Trải nghiệm mượt, dễ xem trên mobile.", "Khám phá website bất động sản của HYUN."]'
-                >
-                  <div class="movie-preview-base" aria-hidden="true">
-                    <span class="movie-preview-hint">Giao diện thật từ Real Estate</span>
-                  </div>
-                  <div class="movie-live-layer" aria-hidden="true">
-                    <iframe
-                      class="movie-live-iframe"
-                      src="https://real-estate-mauve-rho.vercel.app/"
-                      title="Preview Real Estate"
-                      loading="lazy"
-                    ></iframe>
-                  </div>
-                  <div class="movie-promo-overlay">
-                    <p class="movie-promo-text mb-0 fw-semibold text-white lh-sm">Real Estate - giao diện giới thiệu dự án rõ ràng.</p>
-                  </div>
-                </div>
-                <div class="p-4">
-                  <span class="badge text-bg-light border">LANDING PAGE</span>
-                  <h3 class="h5 mt-3">Real Estate Website</h3>
-                  <p class="text-secondary mb-3">
-                    Website bất động sản mình phát triển để giới thiệu dự án, vị trí và thông tin nổi bật.
-                  </p>
-                  <a
-                    class="link-highlight"
-                    href="https://real-estate-mauve-rho.vercel.app/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Mở web bất động sản <i class="bi bi-arrow-up-right"></i>
-                  </a>
-                </div>
-              </article>
-            </div>
-
-            <div class="col-md-6 col-lg-3" data-aos="zoom-in-up" data-aos-delay="190">
-              <article class="project-card h-100">
-                <div
                   class="project-preview preview-d movie-showcase"
                   data-phrases='["Manga Five - web manga HYUN tự phát triển.", "Giao diện rõ ràng, đọc truyện dễ theo dõi.", "Tối ưu trải nghiệm xem nội dung trên nhiều màn hình.", "Khám phá Manga Five ngay nhé."]'
                 >
@@ -509,6 +478,85 @@
                 </div>
               </article>
             </div>
+
+            <div class="col-md-6 col-lg-3" data-aos="zoom-in-up" data-aos-delay="190">
+              <article class="project-card h-100">
+                <div
+                  class="project-preview preview-d movie-showcase"
+                  data-phrases='["Trasua Shop - web bán trà sữa của HYUN.", "Nhiều hương vị đa dạng, hấp dẫn.", "Trải nghiệm mượt, dễ xem trên mobile.", "Khám phá Trasua Shop ngay nhé."]'
+                >
+                  <div class="movie-preview-base" aria-hidden="true">
+                    <span class="movie-preview-hint">Giao diện thật từ Trasua Shop</span>
+                  </div>
+                  <div class="movie-live-layer" aria-hidden="true">
+                    <iframe
+                      class="movie-live-iframe"
+                      src="https://trasua-gilt.vercel.app/"
+                      title="Preview Trasua Shop"
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+                  <div class="movie-promo-overlay">
+                    <p class="movie-promo-text mb-0 fw-semibold text-white lh-sm">Trasua Shop - web bán trà sữa của HYUN.</p>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <span class="badge text-bg-light border">E-COMMERCE</span>
+                  <h3 class="h5 mt-3">Trasua Shop</h3>
+                  <p class="text-secondary mb-3">
+                    Website bán trà sữa mình phát triển, mang đến trải nghiệm đặt món dễ dàng.
+                  </p>
+                  <a
+                    class="link-highlight"
+                    href="https://trasua-gilt.vercel.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Mở web trà sữa <i class="bi bi-arrow-up-right"></i>
+                  </a>
+                </div>
+              </article>
+            </div>
+
+            <div class="col-md-6 col-lg-3" data-aos="zoom-in-up" data-aos-delay="250">
+              <article class="project-card h-100">
+                <div
+                  class="project-preview preview-d movie-showcase realestate-showcase"
+                  data-phrases='["Real Estate - giao diện giới thiệu dự án rõ ràng.", "Hiển thị bất động sản nổi bật theo bố cục hiện đại.", "Trải nghiệm mượt, dễ xem trên mobile.", "Khám phá website bất động sản của HYUN."]'
+                >
+                  <div class="movie-preview-base" aria-hidden="true">
+                    <span class="movie-preview-hint">Giao diện thật từ Real Estate</span>
+                  </div>
+                  <div class="movie-live-layer" aria-hidden="true">
+                    <iframe
+                      class="movie-live-iframe"
+                      src="https://real-estate-mauve-rho.vercel.app/"
+                      title="Preview Real Estate"
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+                  <div class="movie-promo-overlay">
+                    <p class="movie-promo-text mb-0 fw-semibold text-white lh-sm">Real Estate - giao diện giới thiệu dự án rõ ràng.</p>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <span class="badge text-bg-light border">LANDING PAGE</span>
+                  <h3 class="h5 mt-3">Real Estate Website</h3>
+                  <p class="text-secondary mb-3">
+                    Website bất động sản mình phát triển để giới thiệu dự án, vị trí và thông tin nổi bật.
+                  </p>
+                  <a
+                    class="link-highlight"
+                    href="https://real-estate-mauve-rho.vercel.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Mở web bất động sản <i class="bi bi-arrow-up-right"></i>
+                  </a>
+                </div>
+              </article>
+            </div>
+          </div>
           </div>
         </div>
       </section>

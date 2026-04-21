@@ -1008,3 +1008,21 @@ if (contactForm) {
     }
   });
 }
+
+const buildsContainer = document.querySelector('.builds-scroll-container');
+const buildsBtnPrev = document.querySelector('.builds-btn-prev');
+const buildsBtnNext = document.querySelector('.builds-btn-next');
+
+if (buildsContainer && buildsBtnPrev && buildsBtnNext) {
+  buildsBtnPrev.addEventListener('click', () => {
+    const firstCard = buildsContainer.querySelector('.col-md-6, .col-lg-3');
+    const scrollAmount = firstCard ? firstCard.offsetWidth : 300;
+    buildsContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  });
+
+  buildsBtnNext.addEventListener('click', () => {
+    const firstCard = buildsContainer.querySelector('.col-md-6, .col-lg-3');
+    const scrollAmount = firstCard ? firstCard.offsetWidth : 300;
+    buildsContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  });
+}
