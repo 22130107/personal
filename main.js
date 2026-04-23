@@ -439,7 +439,7 @@ selfcareShowcases.forEach((showcase) => {
 
     const playPromise = videoEl.play();
     if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {});
+      playPromise.catch(() => { });
     }
   });
 
@@ -529,7 +529,7 @@ musicVideoShowcases.forEach((showcase) => {
     if (!document.hidden && !showcase.classList.contains("has-video-error")) {
       const playPromise = player.play();
       if (playPromise && typeof playPromise.catch === "function") {
-        playPromise.catch(() => {});
+        playPromise.catch(() => { });
       }
     }
   });
@@ -633,7 +633,7 @@ if (
 
     const playPromise = activeVideo.play();
     if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {});
+      playPromise.catch(() => { });
     }
   };
 
@@ -773,11 +773,11 @@ if (contactForm) {
 
       const recentPayloads = Array.isArray(parsed.recentPayloads)
         ? parsed.recentPayloads.filter(
-            (item) =>
-              item &&
-              typeof item.fingerprint === "string" &&
-              typeof item.timestamp === "number"
-          )
+          (item) =>
+            item &&
+            typeof item.fingerprint === "string" &&
+            typeof item.timestamp === "number"
+        )
         : [];
 
       const lastSubmitAt = typeof parsed.lastSubmitAt === "number" ? parsed.lastSubmitAt : 0;

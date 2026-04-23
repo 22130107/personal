@@ -260,10 +260,12 @@ h3,
 }
 
 @keyframes floatY {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -743,8 +745,16 @@ h3,
 }
 
 @keyframes autoScrollPreview {
-  0%, 10% { transform: translateY(0); }
-  90%, 100% { transform: translateY(var(--scroll-dist, 0)); }
+
+  0%,
+  10% {
+    transform: translateY(0);
+  }
+
+  90%,
+  100% {
+    transform: translateY(var(--scroll-dist, 0));
+  }
 }
 
 .movie-preview-image {
@@ -942,6 +952,7 @@ h3,
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
 .builds-scroll-container::-webkit-scrollbar {
   display: none;
 }
