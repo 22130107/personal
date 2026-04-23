@@ -701,30 +701,6 @@ h3,
 .movie-showcase {
   isolation: isolate;
   cursor: pointer;
-  --movie-iframe-width: 1920px;
-  --movie-iframe-height: 1080px;
-  --movie-iframe-offset-x: 0px;
-  --movie-iframe-offset-y: -14px;
-  --movie-iframe-scale: 0.215;
-  --movie-iframe-scale-hover: 0.22;
-}
-
-.gongcha-showcase {
-  --movie-iframe-width: 1366px;
-  --movie-iframe-height: 768px;
-  --movie-iframe-offset-x: 0px;
-  --movie-iframe-offset-y: -2px;
-  --movie-iframe-scale: 0.268;
-  --movie-iframe-scale-hover: 0.274;
-}
-
-.realestate-showcase {
-  --movie-iframe-width: 1366px;
-  --movie-iframe-height: 768px;
-  --movie-iframe-offset-x: 0px;
-  --movie-iframe-offset-y: -6px;
-  --movie-iframe-scale: 0.265;
-  --movie-iframe-scale-hover: 0.271;
 }
 
 .movie-preview-base {
@@ -766,22 +742,27 @@ h3,
   box-shadow: none;
 }
 
-.movie-live-iframe {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: var(--movie-iframe-width);
-  height: var(--movie-iframe-height);
-  border: 0;
-  transform-origin: top center;
-  transform: translate(calc(-50% + var(--movie-iframe-offset-x)), var(--movie-iframe-offset-y)) scale(var(--movie-iframe-scale));
-  pointer-events: none;
+@keyframes autoScrollPreview {
+  0%, 10% { transform: translateY(0); }
+  90%, 100% { transform: translateY(var(--scroll-dist, 0)); }
 }
 
-.movie-showcase:hover .movie-live-iframe,
-.movie-showcase.is-active .movie-live-iframe,
-.movie-showcase:focus-within .movie-live-iframe {
-  transform: translate(calc(-50% + var(--movie-iframe-offset-x)), var(--movie-iframe-offset-y)) scale(var(--movie-iframe-scale-hover));
+.movie-preview-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  z-index: 1;
+  transform: translateY(0);
+  animation: autoScrollPreview var(--scroll-duration, 20s) linear infinite;
+  animation-play-state: paused;
+}
+
+.movie-showcase:hover .movie-preview-image,
+.movie-showcase.is-hovered .movie-preview-image,
+.movie-showcase:focus-within .movie-preview-image {
+  animation-play-state: running;
 }
 
 .movie-promo-overlay {
